@@ -1,0 +1,109 @@
+// =========================================================================================
+// ATLIQ MART SUPPLY CHAIN — DAX MEASURE LIBRARY
+// Paste these into a dedicated "_Measures" table (Modeling > New Table > name it _Measures,
+// then create each measure against that table instead of scattering them across fact tables).
+// =========================================================================================
+
+// -----------------------------------------------------------------------------------------
+// CORE VOLUME
+// -----------------------------------------------------------------------------------------
+Total Orders = COUNTROWS(fact_orders_aggregate)
+
+Total Order Lines = COUNTROWS(fact_order_lines)
+
+Total Customers = DISTINCTCOUNT(dim_customers[customer_id])
+
+Total Products = DISTINCTCOUNT(dim_products[product_id])
+
+// -----------------------------------------------------------------------------------------
+// HEADLINE SERVICE METRICS (order-level: OT / IF / OTIF)
+// -----------------------------------------------------------------------------------------
+On Time Orders = SUM(fact_orders_aggregate[on_time])
+
+On Time % = DIVIDE([On Time Orders], [Total Orders])
+
+Late Orders = [Total Orders] - [On Time Orders]
+
+Late % = 1 - [On Time %]
+
+In Full Orders = SUM(fact_orders_aggregate[in_full])
+
+In Full % = DIVIDE([In Full Orders], [Total Orders])
+
+OTIF Orders = SUM(fact_orders_aggregate[otif])
+
+OTIF % = DIVIDE([OTIF Orders], [Total Orders])
+
+// -----------------------------------------------------------------------------------------
+// LINE-LEVEL VOLUME METRICS (VOFR / LIFR — need fact_order_lines, not the aggregate table)
+// -----------------------------------------------------------------------------------------
+Total Qty Ordered = SUM(fact_order_lines[order_qty])
+
+Total Qty Delivered = SUM(fact_order_lines[delivery_qty])
+
+Qty Shortfall = [Total Qty Ordered] - [Total Qty Delivered]
+
+Volume Fill Rate % (VOFR) = DIVIDE([Total Qty Delivered], [Total Qty Ordered])
+
+Line Fill Rate % (LIFR) = DIVIDE(SUM(fact_order_lines[in_full]), COUNTROWS(fact_order_lines))
+
+// -----------------------------------------------------------------------------------------
+// TARGETS & GAPS (dim_targets_orders stores targets as whole numbers, e.g. 70 = 70%)
+// -----------------------------------------------------------------------------------------
+Target OnTime % = AVERAGE(dim_targets_orders[ontime_target_pct]) / 100
+
+Target InFull % = AVERAGE(dim_targets_orders[infull_target_pct]) / 100
+
+Target OTIF % = AVERAGE(dim_targets_orders[otif_target_pct]) / 100
+
+OTIF Gap (pts) = ([OTIF %] - [Target OTIF %]) * 100
+
+OTIF Status =
+VAR Gap = [OTIF Gap (pts)]
+RETURN
+    IF(ISBLANK(Gap), BLANK(), IF(Gap >= 0, "Meets Target", "Below Target"))
+
+// -----------------------------------------------------------------------------------------
+// TIME INTELLIGENCE — requires dim_date marked as the model's official Date table
+// (Model view > right-click dim_date > Mark as date table > calendar_date)
+// -----------------------------------------------------------------------------------------
+Orders Prior Month =
+CALCULATE([Total Orders], DATEADD(dim_date[calendar_date], -1, MONTH))
+
+MoM Orders Change % = DIVIDE([Total Orders] - [Orders Prior Month], [Orders Prior Month])
+
+OTIF % Prior Week =
+CALCULATE([OTIF %], DATEADD(dim_date[calendar_date], -7, DAY))
+
+WoW OTIF Change (pts) = ([OTIF %] - [OTIF % Prior Week]) * 100
+
+// -----------------------------------------------------------------------------------------
+// CUSTOMER RISK / SEGMENTATION (drives the "at-risk customers" visuals)
+// -----------------------------------------------------------------------------------------
+At-Risk Customers (OTIF<10%) =
+CALCULATE(
+    DISTINCTCOUNT(dim_customers[customer_id]),
+    FILTER(VALUES(dim_customers[customer_id]), [OTIF %] < 0.10)
+)
+
+Customer Performance Tier =
+VAR CustomerOtif = [OTIF %]
+RETURN
+    SWITCH(
+        TRUE(),
+        ISBLANK(CustomerOtif), BLANK(),
+        CustomerOtif >= 0.85, "Excellent",
+        CustomerOtif >= 0.70, "Good",
+        CustomerOtif >= 0.50, "Poor",
+        "Critical"
+    )
+
+// -----------------------------------------------------------------------------------------
+// FORMATTED STRINGS FOR CARD VISUALS (optional — nicer than relying on the format pane alone)
+// -----------------------------------------------------------------------------------------
+OTIF % (label) = FORMAT([OTIF %], "0.0%") & " OTIF"
+
+OTIF vs Target (label) =
+VAR Gap = [OTIF Gap (pts)]
+RETURN FORMAT([OTIF %], "0.0%") & " (target " & FORMAT([Target OTIF %], "0.0%") &
+    ", " & IF(Gap >= 0, "+", "") & FORMAT(Gap, "0.0") & " pts)"

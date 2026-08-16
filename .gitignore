@@ -1,0 +1,13 @@
+presentation/AtliQ Mart Supply Chain Video Presentation.mp4
+
+# secrets
+.env
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
