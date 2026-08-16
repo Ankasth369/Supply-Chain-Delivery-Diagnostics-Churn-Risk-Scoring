@@ -46,7 +46,7 @@ every measure instead of scattering them across fact tables — standard practic
 the first thing an interviewer looks for when they open your model.
 
 Copy every measure from [`dax_measures.txt`](dax_measures.txt) into `_Measures`, one at a
-time (New Measure, paste the name and formula). ~24 measures total: core volume, headline
+time (New Measure, paste the name and formula). 30 measures total: core volume, headline
 OT/IF/OTIF, VOFR/LIFR, target gaps, MoM/WoW time intelligence, and customer risk tiering.
 
 ## 4. Report pages

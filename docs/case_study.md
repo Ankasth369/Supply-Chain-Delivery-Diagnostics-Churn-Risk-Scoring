@@ -39,14 +39,14 @@ I treated this as an end-to-end analytics engagement rather than a single dashbo
    OTIF failure is predictable at order-intake time (it isn't — ROC-AUC ~0.53 even after
    balancing classes, which is itself the finding), and a Holt-Winters forecast projecting
    the 29% OTIF rate stays flat for the next month absent intervention.
-5. **Power BI dashboard** (`powerbi/`) — rebuilt the data model and 24 DAX measures from
+5. **Power BI dashboard** (`powerbi/`) — rebuilt the data model and 30 DAX measures from
    scratch, connected live to MySQL, across 4 report pages (one more than the original: a
    dedicated diagnostics page for the day-of-week/order-size/forecast findings).
 
 ## Key findings
 
-- **OTIF is 29.0%** against a ~66-70% target — a 37-41 point gap, and the primary driver of
-  contract losses.
+- **OTIF is 29.0%** against a 65.9% average target (individually set per customer, ranging
+  49-75%) — a 36.9-point gap on average, and the primary driver of contract losses.
 - **On-Time is 59.0%, In-Full is 52.8%** — both are broken, not just one.
 - **Volume Fill Rate is strong (~96%) but Line Fill Rate is weak (<68%)** — the company
   delivers *most units* correctly but rarely delivers a full order complete, meaning the

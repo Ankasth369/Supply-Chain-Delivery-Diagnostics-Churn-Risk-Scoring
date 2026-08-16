@@ -9,9 +9,9 @@ run before publishing (`sql/02_eda_data_quality.sql` section 7 has the headline 
 - Designed and built a MySQL star schema (6 tables, FK/index design) and a Python ETL
   pipeline to clean and load 88K+ raw order records, resolving multi-format date fields and
   inconsistent categorical data.
-- Wrote 28+ SQL queries (CTEs, window functions, cross-dialect median calculation) to
-  diagnose a 71%-order-failure delivery problem, isolating OTIF at 29% against a ~70% target
-  and identifying a 360K-unit Dairy category shortfall as the single largest fix target.
+- Wrote 31 SQL queries (CTEs, window functions, cross-dialect median calculation) to
+  diagnose a 71%-order-failure delivery problem, isolating OTIF at 29% against a 66% average
+  target and identifying a 360K-unit Dairy category shortfall as the single largest fix target.
 - Built an RFM-style composite risk-scoring model in SQL to rank all customers (not just a
   top-N list) by churn risk, combining order frequency, service reliability, and recency into
   a single actionable segmentation.
@@ -22,17 +22,17 @@ run before publishing (`sql/02_eda_data_quality.sql` section 7 has the headline 
 - Forecasted OTIF trend with Holt-Winters exponential smoothing (statsmodels), projecting
   continued stagnation absent intervention — used to justify immediate vs. long-term
   recommendation prioritization.
-- Designed a 4-page Power BI dashboard from a live MySQL connection with 24 custom DAX
+- Designed a 4-page Power BI dashboard from a live MySQL connection with 30 custom DAX
   measures (time intelligence, target-gap tracking, dynamic risk tiering), replacing static
   reporting with self-serve drill-down by customer, product, and city.
 
 ## LinkedIn / portfolio blurb (short paragraph form)
 
 > Rebuilt an end-to-end supply-chain analytics project from raw CSVs to a live dashboard:
-> designed a MySQL schema and ETL pipeline, wrote 28+ SQL queries including an original
+> designed a MySQL schema and ETL pipeline, wrote 31 SQL queries including an original
 > RFM-style customer risk model, tested (and ruled out) order-level predictability of
 > delivery failure with scikit-learn, forecasted the delivery-performance trend with
-> statsmodels, and built a 4-page Power BI dashboard with 24 DAX measures on top of it all.
+> statsmodels, and built a 4-page Power BI dashboard with 30 DAX measures on top of it all.
 > Full write-up: [link to case_study.md or hosted dashboard]
 
 ## Interview talking points (things you should be ready to explain cold)

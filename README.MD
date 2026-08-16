@@ -34,7 +34,7 @@ concentrated. The goal: quantify it, find the root cause, and prioritize fixes.
 
 | Metric | Value | Target | Gap |
 |---|---|---|---|
-| OTIF% | 29.0% | ~66-70% | 37-41 points |
+| OTIF% | 29.0% | 65.9% avg (49-75% by customer) | 36.9 points |
 | On-Time% | 59.0% | — | — |
 | In-Full% | 52.8% | — | — |
 | Volume Fill Rate | ~96% | — | strong |
@@ -60,7 +60,7 @@ Full detail in [`docs/case_study.md`](docs/case_study.md).
 | ETL | Python (pandas, SQLAlchemy) — cleans mixed date formats & inconsistent casing |
 | Analysis (SQL) | CTEs, window functions (`NTILE`, `LAG`, `DENSE_RANK`), manual median calc |
 | Analysis (Python) | pandas, seaborn/matplotlib, scikit-learn, statsmodels |
-| Visualization | Power BI — live MySQL connection, 24 DAX measures, 4-page dashboard |
+| Visualization | Power BI — live MySQL connection, 30 DAX measures, 4-page dashboard |
 
 ## Project structure
 
@@ -77,7 +77,7 @@ python/
   otif_trend_forecast.ipynb    — Holt-Winters forecast of weekly OTIF%
 powerbi/
   BUILD_GUIDE.md               — page-by-page rebuild spec
-  dax_measures.txt             — all 24 DAX measures, ready to paste into Power BI Desktop
+  dax_measures.txt             — all 30 DAX measures, ready to paste into Power BI Desktop
 docs/
   case_study.md                — full narrative write-up
   resume_bullets.md            — draft resume/LinkedIn copy
