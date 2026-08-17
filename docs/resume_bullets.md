@@ -4,6 +4,24 @@ Pick 3-4 for a resume (space is tight); use more freely on LinkedIn/portfolio pa
 Numbers are drawn directly from `sql/` and `python/` outputs — verify them against your own
 run before publishing (`sql/02_eda_data_quality.sql` section 7 has the headline figures).
 
+## Final resume entry (LaTeX)
+
+The version actually chosen for the resume — title picked to name the two things the four
+bullets back up (delivery diagnostics + churn risk scoring), not a generic project label.
+
+```latex
+\subhead{\textbf{Supply Chain Delivery Diagnostics \& Churn Risk Scoring} $\vert$ \emph{Self Project} \hfill \emph{(2026)}}
+\begin{itemize}
+    \item Built a \textbf{MySQL} schema \& \textbf{Python ETL} pipeline to clean \& load \textbf{88,825 orders}, fixing date \& category errors
+    \item Wrote \textbf{31 SQL queries} using \textbf{CTEs \& window functions} to uncover a \textbf{29\% OTIF rate} \& a \textbf{360K-unit} shortfall
+    \item Modeled customer churn risk with an \textbf{RFM-style SQL} scoring system across \textbf{35 customers}, flagging \textbf{5} for retention
+    \item Shipped a \textbf{4-page Power BI} dashboard with \textbf{30 DAX measures} for live, self-serve OTIF tracking
+\end{itemize}
+```
+
+**Reminder:** bullet 4 describes a dashboard that doesn't exist yet as of this writing — build
+it (`powerbi/BUILD_GUIDE.md`) before this resume version actually goes out to anyone.
+
 ## Resume bullets (achievement-first, quantified)
 
 - Designed and built a MySQL star schema (6 tables, FK/index design) and a Python ETL
