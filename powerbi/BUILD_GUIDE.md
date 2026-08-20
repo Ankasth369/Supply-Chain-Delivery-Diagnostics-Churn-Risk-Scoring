@@ -1,64 +1,134 @@
 # Power BI Rebuild Guide
 
 Everything here is meant to be built by hand in Power BI Desktop, connected to the MySQL
-database this project already set up (`atliq_mart_supplychain`). Budget ~45-60 minutes.
-This rebuild connects live to MySQL instead of reusing the original repo's `.pbix`, so the
-model, DAX, and layout are all your own work.
+database this project already set up (`atliq_mart_supplychain`). Budget ~60-90 minutes if
+you're new to Power BI's UI. This rebuild connects live to MySQL instead of reusing the
+original repo's `.pbix`, so the model, DAX, and layout are all your own work.
+
+Written click-by-click on purpose — if a step doesn't match what you see on screen, that's
+the signal something's off (wrong window, wrong view), not that you did it wrong.
+
+## Prerequisites (should already be done)
+
+- MySQL Server running locally with database `atliq_mart_supplychain` (see `sql/00_schema_mysql.sql`)
+- MySQL Connector/NET installed (from `https://dev.mysql.com/downloads/connector/net/` — the
+  "Windows (x86, 32-bit), MSI Installer" package works fine on 64-bit Windows too)
+- Power BI Desktop installed and open to a **blank report** — if you only see three tabs
+  (File, Home, Help) at the top, you're on the start/welcome screen, not an actual report.
+  Click "Blank report" on that screen first.
 
 ## 1. Connect to MySQL
 
-1. Power BI Desktop → **Get Data** → search **MySQL database** (install the free "MySQL
-   Connector/NET" if Power BI prompts you — it's a one-time driver install).
-2. Server: `localhost:3306`. Database: `atliq_mart_supplychain`.
-3. Credentials: **Database** auth, username `atliq_analyst`, password = whatever you set
-   when you created that MySQL user (see `sql/00_schema_mysql.sql` setup notes — don't reuse
-   the same password anywhere this gets committed to git).
-4. Import all 6 tables: `dim_customers`, `dim_products`, `dim_date`, `dim_targets_orders`,
-   `fact_order_lines`, `fact_orders_aggregate`. Use **Import** mode, not DirectQuery — the
-   dataset is small (~57K rows) and Import gives you full DAX time-intelligence support.
+1. In Power BI Desktop, click the **Home** tab (top-left) if it isn't already selected.
+2. Click **Get Data** → in the search box that opens, type `mysql`.
+3. Select **MySQL database** from the results → click **Connect**.
+4. A dialog asks for Server and Database:
+   - Server: `localhost:3306`
+   - Database: `atliq_mart_supplychain`
+   - Click **OK**.
+5. A credentials dialog appears with tabs on the left (Windows, Database, Microsoft account).
+   Click the **Database** tab → enter:
+   - Username: `atliq_analyst`
+   - Password: `AtliqMart_2026!`
+   - Click **Connect**.
+6. A **Navigator** window lists your tables on the left with checkboxes. Check all 6:
+   `dim_customers`, `dim_products`, `dim_date`, `dim_targets_orders`, `fact_order_lines`,
+   `fact_orders_aggregate`.
+7. Click **Load** (bottom-right) — not "Transform Data". The Python ETL already cleaned
+   everything, so no Power Query edits are needed. Loading ~89K rows takes a few seconds.
+
+**You'll know this worked** when the **Fields pane** on the right side of the screen lists
+all 6 tables, each with an arrow you can expand to see its columns.
 
 ## 2. Data model (Model view)
 
-Relationships to create (drag from the "one" side to the "many" side):
+1. Look at the far-left edge of the Power BI window — there are 3 icons stacked vertically:
+   **Report**, **Data**, **Model** (they look like a bar chart, a grid/table, and a small
+   schema diagram respectively). Click **Model**.
+2. You'll see all 6 tables as boxes you can drag around. No lines connect them yet.
+3. To create a relationship: click a field name inside one table's box and **drag it onto**
+   the matching field name in another table's box, then release. A dialog confirms the
+   relationship — it should auto-detect "Many to one" with the dim table on the "one" side.
+   Click **OK** without changing anything else.
 
-| From (one) | To (many) | Notes |
-|---|---|---|
-| `dim_customers[customer_id]` | `fact_order_lines[customer_id]` | |
-| `dim_customers[customer_id]` | `fact_orders_aggregate[customer_id]` | |
-| `dim_customers[customer_id]` | `dim_targets_orders[customer_id]` | 1:1 |
-| `dim_products[product_id]` | `fact_order_lines[product_id]` | |
-| `dim_date[calendar_date]` | `fact_orders_aggregate[order_placement_date]` | mark active |
-| `dim_date[calendar_date]` | `fact_order_lines[order_placement_date]` | mark active |
+Create these 6 relationships (drag from the left column onto the right column):
 
-`fact_order_lines` also has `agreed_delivery_date` and `actual_delivery_date`. Don't create
-active relationships for those (Power BI only allows one active path between two tables) —
-leave them unrelated, or add them as **inactive** relationships and reference with
-`USERELATIONSHIP()` only if you build a delay-specific measure later.
+| Drag from | Drop onto |
+|---|---|
+| `dim_customers[customer_id]` | `fact_order_lines[customer_id]` |
+| `dim_customers[customer_id]` | `fact_orders_aggregate[customer_id]` |
+| `dim_customers[customer_id]` | `dim_targets_orders[customer_id]` |
+| `dim_products[product_id]` | `fact_order_lines[product_id]` |
+| `dim_date[calendar_date]` | `fact_orders_aggregate[order_placement_date]` |
+| `dim_date[calendar_date]` | `fact_order_lines[order_placement_date]` |
 
-**Mark `dim_date` as the official date table**: right-click it in Model view → *Mark as date
-table* → pick `calendar_date`. This unlocks `DATEADD`/`SAMEPERIODLASTYEAR`-style time
-intelligence in the DAX library.
+**Skip** `agreed_delivery_date` and `actual_delivery_date` in `fact_order_lines` — don't
+connect those to `dim_date` (Power BI only allows one active relationship per table pair,
+and `order_placement_date` already uses that slot).
+
+4. **Mark `dim_date` as the official date table**: right-click the `dim_date` table's title
+   bar in Model view → **Mark as date table** → in the dropdown pick `calendar_date` → **OK**.
+   This unlocks `DATEADD`/time-intelligence functions used in section 3 below.
+
+**You'll know this worked** when you see 6 lines connecting the table boxes, each showing a
+"1" near the dim table and a "*" (many) near the fact table.
 
 ## 3. DAX measures
 
-Create a blank table (Modeling ribbon → **New Table** → formula `_Measures = { }`) to hold
-every measure instead of scattering them across fact tables — standard practice, and it's
-the first thing an interviewer looks for when they open your model.
+### 3a. Create a home for your measures
 
-Copy every measure from [`dax_measures.txt`](dax_measures.txt) into `_Measures`, one at a
-time (New Measure, paste the name and formula). 30 measures total: core volume, headline
-OT/IF/OTIF, VOFR/LIFR, target gaps, MoM/WoW time intelligence, and customer risk tiering.
+1. Still anywhere in Power BI Desktop, click the **Modeling** tab at the top (next to Home,
+   Insert, View). If you don't see a **Modeling** tab at all, you're likely still on the
+   welcome screen — go back to Prerequisites above.
+2. In the Modeling ribbon, find the **Calculations** group of buttons: **New Measure**,
+   **New Column**, **New Table**. Click **New Table**.
+3. A formula bar opens at the top with a blinking cursor. Type exactly:
+   ```
+   _Measures = {1}
+   ```
+4. Press **Enter**.
+5. Check the **Fields** pane on the right — a new table `_Measures` should now be listed,
+   containing one column called `Value`. (Optional tidy-up: right-click that `Value` column
+   → **Hide in report view**, since you'll never actually use it.)
+
+### 3b. Add the measures, one at a time, in order
+
+**Order matters**: many measures reference earlier ones (e.g. `On Time %` uses
+`[On Time Orders]` and `[Total Orders]`, which must exist first). Go through
+[`dax_measures.txt`](dax_measures.txt) **top to bottom**. Skip lines starting with `//` —
+those are section headers, not measures.
+
+For each measure:
+1. Click `_Measures` in the Fields pane to select it.
+2. **Modeling** tab → **New Measure**. A formula bar opens.
+3. Click the small **∨ chevron** at the right end of the formula bar to expand it into a
+   multi-line editor — makes pasting the multi-line measures much easier.
+4. Copy one full measure block from `dax_measures.txt` (from its name through the end of its
+   formula) and paste it into the formula bar.
+5. Click the **✓ checkmark** button next to the formula bar (or press Ctrl+Enter) to commit.
+6. Repeat from step 2 for the next measure.
+
+There are 30 measures total, covering: core volume, headline OT/IF/OTIF, VOFR/LIFR, target
+gaps, MoM/WoW time intelligence, and customer risk tiering.
+
+**If a measure shows a red squiggly underline or an error on commit**: the most common cause
+is a typo from copy-paste (a stray character) or trying to reference a measure you haven't
+created yet — check it's not skipped and matches the file exactly.
+
+**You'll know this worked** when `_Measures` in the Fields pane expands to show all 30
+measure names (look for the calculator-icon next to each, distinguishing them from columns).
 
 ## 4. Report pages
 
 Four pages — one more than the original's three, adding a diagnostics page for the
-day-of-week / order-size / forecast findings from the Python notebooks.
+day-of-week / order-size / forecast findings from the Python notebooks. Click the **+** tab
+at the bottom of the canvas to add each new page.
 
 **Page 1 — Overview**
 - KPI cards: `[Total Orders]`, `[OTIF %]`, `[On Time %]`, `[In Full %]`, `[OTIF Gap (pts)]`
   (conditional-format red/green on sign)
 - Line chart: OTIF% by week (`dim_date[week_no]` on axis, `[OTIF %]` on values), with a
-  constant-line at the average target OTIF (~70%) for visual gap reference
+  constant-line at the average target OTIF (~66%) for visual gap reference
 - Slicers: city, customer, product category, date range
 - Card or button strip navigating to the other 3 pages (Bookmarks + Buttons)
 
