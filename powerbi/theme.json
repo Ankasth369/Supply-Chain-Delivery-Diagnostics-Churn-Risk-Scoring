@@ -1,0 +1,29 @@
+{
+  "name": "Supply Chain Delivery Diagnostics",
+  "dataColors": [
+    "#0F6FC6",
+    "#2E7D32",
+    "#C62828",
+    "#F9A825",
+    "#6A1B9A",
+    "#00838F",
+    "#8D6E63",
+    "#757575"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#252423",
+  "tableAccent": "#0F6FC6",
+  "good": "#2E7D32",
+  "neutral": "#F9A825",
+  "bad": "#C62828",
+  "maximum": "#0F6FC6",
+  "center": "#F9A825",
+  "minimum": "#C62828",
+  "null": "#BDBDBD",
+  "textClasses": {
+    "callout": { "fontSize": 32, "fontFace": "Segoe UI Semibold", "color": "#252423" },
+    "title": { "fontSize": 13, "fontFace": "Segoe UI Semibold", "color": "#252423" },
+    "header": { "fontSize": 11, "fontFace": "Segoe UI Semibold", "color": "#252423" },
+    "label": { "fontSize": 10, "fontFace": "Segoe UI", "color": "#605E5C" }
+  }
+}
