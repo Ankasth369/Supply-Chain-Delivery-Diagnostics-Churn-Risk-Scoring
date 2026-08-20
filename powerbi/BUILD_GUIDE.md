@@ -40,6 +40,26 @@ the signal something's off (wrong window, wrong view), not that you did it wrong
 **You'll know this worked** when the **Fields pane** on the right side of the screen lists
 all 6 tables, each with an arrow you can expand to see its columns.
 
+### 1b. Fix Boolean-typed flag columns (do this now, before writing any measures)
+
+MySQL's `TINYINT(1)` type (used for `on_time`, `in_full`, `otif`, `on_time_in_full` in the
+schema) is auto-interpreted as **True/False (Boolean)** by the MySQL Connector/NET driver
+instead of as a 0/1 whole number — `TINYINT(1)` is literally MySQL's alias for `BOOLEAN`, so
+this is a well-known cross-driver gotcha, not a mistake in the schema. Left as-is, any DAX
+measure using `SUM()` on these columns fails with an error like:
+`The function SUM cannot work with values of type Boolean.`
+
+Fix it once, right after loading, so it never comes up while writing measures:
+
+1. **Home** ribbon → **Transform Data** (opens the Power Query Editor in a new window).
+2. In the **Queries** pane on the left, click `fact_orders_aggregate`.
+3. In the data preview grid, click the `on_time` column header, then **Ctrl+click** `in_full`
+   and `otif` to select all three at once.
+4. Right-click any of the selected headers → **Change Type** → **Whole Number**.
+5. Click `fact_order_lines` in the Queries pane and repeat for its `on_time`, `in_full`, and
+   `on_time_in_full` columns.
+6. Click **Close & Apply** (top-left) to reload the data with the corrected types.
+
 ## 2. Data model (Model view)
 
 1. Look at the far-left edge of the Power BI window — there are 3 icons stacked vertically:
