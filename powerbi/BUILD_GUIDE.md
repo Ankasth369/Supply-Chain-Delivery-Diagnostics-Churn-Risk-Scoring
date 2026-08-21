@@ -60,6 +60,28 @@ Fix it once, right after loading, so it never comes up while writing measures:
    `on_time_in_full` columns.
 6. Click **Close & Apply** (top-left) to reload the data with the corrected types.
 
+### 1c. Fix database-prefixed table names (check this too, right after loading)
+
+Power BI's MySQL connector sometimes auto-prefixes table names with the database name when
+it loads them — e.g. a table shows up in the Fields pane as
+`atliq_mart_supplychain fact_orders_aggregate` instead of plain `fact_orders_aggregate`. If
+you don't catch this, every DAX measure that references `fact_orders_aggregate` by its plain
+name will fail with an error like:
+`Failed to resolve name 'fact_orders_aggregate'. It is not a valid table, variable, or function name.`
+
+Check the Fields pane now, before writing any measures:
+
+1. Look at each of the 6 tables listed in the **Fields pane**. If any name has a prefix
+   before the table name (anything before `dim_` or `fact_`), it needs renaming.
+2. Right-click the prefixed table name → **Rename**.
+3. Type the plain name back in exactly: `dim_customers`, `dim_products`, `dim_date`,
+   `dim_targets_orders`, `fact_order_lines`, or `fact_orders_aggregate` (matching whichever
+   table you're renaming) → **Enter**.
+4. Repeat for any other table that came in prefixed.
+
+This must match exactly, since every formula in `dax_measures.txt` references these 6 tables
+by their plain names.
+
 ## 2. Data model (Model view)
 
 1. Look at the far-left edge of the Power BI window — there are 3 icons stacked vertically:
