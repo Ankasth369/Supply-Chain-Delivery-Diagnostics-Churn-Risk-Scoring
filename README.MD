@@ -35,10 +35,10 @@ concentrated. The goal: quantify it, find the root cause, and prioritize fixes.
 | Metric | Value | Target | Gap |
 |---|---|---|---|
 | OTIF% | 29.0% | 65.9% avg (49-75% by customer) | 36.9 points |
-| On-Time% | 59.0% | — | — |
-| In-Full% | 52.8% | — | — |
-| Volume Fill Rate | ~96% | — | strong |
-| Line Fill Rate | <68% | — | weak |
+| On-Time% | 59.0% | 86.1% avg | 27.1 points |
+| In-Full% | 52.8% | 76.5% avg | 23.7 points |
+| Volume Fill Rate | ~96% | — (no target set) | strong |
+| Line Fill Rate | <68% | — (no target set) | weak |
 
 - **Dairy has a 360,470-unit shortfall** — the single largest fix target of any category.
 - **5 high-volume customers sit under 10% OTIF** and are at immediate churn risk (see the
