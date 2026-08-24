@@ -247,7 +247,13 @@ at the bottom of the canvas to add each new page, then double-click its tab name
    **Get Data** → **MySQL database** → same server/database → but instead of the Navigator,
    click **Advanced options** before connecting and paste the full query text from
    `sql/04_original_analysis.sql` section C into the SQL statement box → Load. Add a second
-   table visual on this page using its `composite_risk_score` and `risk_segment` columns.
+   table visual on this page using its `composite_risk_score` and `risk_segment` columns
+   (also drag in `customer_name` — without it, the table collapses into 4 grouped rows
+   summed by `risk_segment` instead of one row per customer; if that happens, add
+   `customer_name` and change `composite_risk_score`'s aggregation to **"Don't summarize"**).
+   Power BI names this query `Query1`/`Query2` by default — rename it now (right-click it in
+   the Fields pane → **Rename**) to something like `customer_risk_scores`, matching the
+   plain-snake-case style of the other 6 tables.
 
 ### Page 3 — Product & Category
 
@@ -274,7 +280,10 @@ at the bottom of the canvas to add each new page, then double-click its tab name
 2. Import the day-of-week and order-size findings as query tables, the same way as the
    optional risk-score table on Page 2: **Get Data** → **MySQL database** → **Advanced
    options** → paste the query text from `sql/04_original_analysis.sql` sections A and B
-   respectively (two separate Get Data steps, two separate tables) → Load.
+   respectively (two separate Get Data steps, two separate tables) → Load. Rename each one
+   right after loading (right-click it in the Fields pane → **Rename**) — `day_of_week_otif`
+   for section A's query, `order_size_otif` for section B's — instead of leaving them as the
+   default `Query2`/`Query3`.
 3. **Column chart**: empty canvas → **Column chart** → drag the day-of-week table's
    `day_name` to X-axis, `otif_pct` to Y-axis.
 4. **Column chart**: empty canvas → **Column chart** → drag the order-size table's
