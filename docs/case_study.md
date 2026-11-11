@@ -1,7 +1,5 @@
 # Case Study: AtliQ Mart Supply Chain — Delivery Performance Analysis
 
-*Replace the bracketed placeholders below with your own name/contact details before publishing.*
-
 ## The problem
 
 AtliQ Mart, a fast-growing FMCG distributor operating across Gujarat, India, was losing
@@ -68,7 +66,3 @@ day-of-week and order size *don't* matter, and that a classifier *can't* predict
 are just as actionable as the positive findings, because they tell the business where NOT to
 spend effort (a smarter order-screening system) and where TO spend it (warehouse and
 inventory operations).
-
-## Contact
-
-[Your Name] · [your.email@example.com] · [linkedin.com/in/your-profile]

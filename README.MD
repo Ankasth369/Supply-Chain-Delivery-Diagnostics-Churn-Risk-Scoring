@@ -14,8 +14,7 @@ This project analyzes six months of order data for AtliQ Mart, a fictional FMCG 
 resume-project challenge). It's been rebuilt from the ground up as a MySQL + Python + Power BI
 pipeline, going beyond the original brief with an RFM-style customer risk model, a machine
 learning test of whether delivery failure is predictable, and a trend forecast — see
-[`docs/case_study.md`](docs/case_study.md) for the full write-up and
-[`docs/resume_bullets.md`](docs/resume_bullets.md) for draft resume/LinkedIn copy.
+[`docs/case_study.md`](docs/case_study.md) for the full write-up.
 
 ## Problem statement
 
@@ -80,7 +79,6 @@ powerbi/
   dax_measures.txt             — all 30 DAX measures, ready to paste into Power BI Desktop
 docs/
   case_study.md                — full narrative write-up
-  resume_bullets.md            — draft resume/LinkedIn copy
 dataset/                       — original 6 source CSVs (provided by Codebasics)
 ```
 
