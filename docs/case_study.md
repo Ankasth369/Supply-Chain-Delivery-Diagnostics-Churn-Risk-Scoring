@@ -57,6 +57,29 @@ I treated this as an end-to-end analytics engagement rather than a single dashbo
   That rules out "smarter order intake" as a fix and points squarely at fulfillment capacity
   and inventory management.
 
+## Recommendations and next steps
+
+**Supported by the data:**
+
+1. **Focus on fulfillment, not order intake.** Day-of-week and order size show no meaningful
+   effect, and a classifier finds no learnable pattern in failing orders, so effort should go
+   to fulfillment capacity and inventory availability.
+2. **Start with Dairy.** It has the largest unit shortfall (360,470 units) of any category.
+3. **Prioritize retention outreach.** Contact the 5 customers below 10% OTIF first, then work
+   down the composite risk ranking of all 35 customers.
+4. **Do not expect self-correction.** The forecast holds OTIF flat near 29% without
+   intervention.
+
+**Needs more data before acting:**
+
+- *Root cause inside operations:* the dataset has no inventory, warehouse, dispatch or transport
+  fields, so it cannot say whether failures come from stock-outs, picking, or logistics.
+  Inventory levels, supplier lead times and dispatch timestamps would be the first additions.
+- *Financial impact:* the revenue-at-risk figure uses assumed unit prices and is illustrative.
+  Real prices and contract values are needed for a decision-grade estimate.
+- *Validation:* pilot fixes on Dairy and the highest-risk customers, and track weekly OTIF in
+  the dashboard to confirm whether the gap closes.
+
 ## Takeaways
 
 **Methods used:** SQL (schema design, CTEs, window functions, adapting a technique across
