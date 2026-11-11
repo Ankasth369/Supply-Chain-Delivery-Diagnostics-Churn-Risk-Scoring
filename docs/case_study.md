@@ -57,12 +57,13 @@ I treated this as an end-to-end analytics engagement rather than a single dashbo
   That rules out "smarter order intake" as a fix and points squarely at fulfillment capacity
   and inventory management.
 
-## What I'd tell a hiring manager
+## Takeaways
 
-The technical skills on display are SQL (schema design, CTEs, window functions, cross-dialect
-adaptation), Python (pandas ETL, scikit-learn, statsmodels), and Power BI (data modeling,
-DAX, dashboard design) — but the more important skill is the negative results: knowing that
-day-of-week and order size *don't* matter, and that a classifier *can't* predict failure risk,
-are just as actionable as the positive findings, because they tell the business where NOT to
-spend effort (a smarter order-screening system) and where TO spend it (warehouse and
-inventory operations).
+**Methods used:** SQL (schema design, CTEs, window functions, adapting a technique across
+dialects), Python (pandas ETL, scikit-learn, statsmodels), and Power BI (data modeling, DAX,
+dashboard design).
+
+**The negative results matter as much as the positive ones.** Day-of-week and order size turn
+out not to matter, and a classifier cannot predict which orders will fail. Both are actionable:
+they show where *not* to spend effort (a smarter order-screening system) and where to spend it
+(warehouse and inventory operations).
