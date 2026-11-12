@@ -72,7 +72,7 @@ Full detail in [`docs/case_study.md`](docs/case_study.md).
 | ETL | Python (pandas, SQLAlchemy) — cleans mixed date formats & inconsistent casing |
 | Analysis (SQL) | CTEs, window functions (`NTILE`, `LAG`, `DENSE_RANK`), manual median calc |
 | Analysis (Python) | pandas, seaborn/matplotlib, scikit-learn, statsmodels |
-| Visualization | Power BI — live MySQL connection, 30 DAX measures, 4-page dashboard |
+| Visualization | Power BI — MySQL connection (Import mode), 30 DAX measures, 4-page dashboard |
 
 ## Project structure
 

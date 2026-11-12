@@ -41,8 +41,9 @@ I treated this as an end-to-end analytics engagement rather than a single dashbo
    and a Holt linear-trend forecast projecting the 29% OTIF rate stays flat for the next
    month (a backtest shows the trend term adds nothing over the historical mean).
 5. **Power BI dashboard** (`powerbi/`) — rebuilt the data model and 30 DAX measures from
-   scratch, connected live to MySQL, across 4 report pages (one more than the original: a
-   dedicated diagnostics page for the day-of-week/order-size/forecast findings).
+   scratch, connected to MySQL (Import mode), across 4 report pages (one more than the
+   original: a diagnostics page for the day-of-week and order-size findings, with a note on
+   the forecast).
 
 ## Key findings
 

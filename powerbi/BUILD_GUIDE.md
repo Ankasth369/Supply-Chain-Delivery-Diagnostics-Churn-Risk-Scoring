@@ -2,7 +2,8 @@
 
 Everything here is meant to be built by hand in Power BI Desktop, connected to the MySQL
 database this project already set up (`atliq_mart_supplychain`). Budget ~60-90 minutes if
-you're new to Power BI's UI. This rebuild connects live to MySQL instead of reusing the
+you're new to Power BI's UI. This rebuild connects to MySQL in Import mode (the data is loaded into the `.pbix`, so click
+Refresh after the database changes) instead of reusing the
 original repo's `.pbix`, so the model, DAX, and layout are all your own work.
 
 Written click-by-click on purpose — if a step doesn't match what you see on screen, that's
@@ -29,7 +30,7 @@ the signal something's off (wrong window, wrong view), not that you did it wrong
 5. A credentials dialog appears with tabs on the left (Windows, Database, Microsoft account).
    Click the **Database** tab → enter:
    - Username: `atliq_analyst`
-   - Password: `AtliqMart_2026!`
+   - Password: the password you set for the `atliq_analyst` MySQL user (never commit it)
    - Click **Connect**.
 6. A **Navigator** window lists your tables on the left with checkboxes. Check all 6:
    `dim_customers`, `dim_products`, `dim_date`, `dim_targets_orders`, `fact_order_lines`,
@@ -289,8 +290,8 @@ at the bottom of the canvas to add each new page, then double-click its tab name
 4. **Column chart**: empty canvas → **Column chart** → drag the order-size table's
    `order_size_bucket` to X-axis, `otif_pct` to Y-axis.
 5. **Text box**: **Insert** ribbon → **Text box** → type the forecast finding directly:
-   *"At current trend, OTIF stays flat around 29% for the next month — this will not
-   self-correct."* This is deliberately static text, not a live measure — the point is
+   *"At the current trend, OTIF stays flat around 29% for the next month, with no sign of
+   self-correction."* This is deliberately static text, not a live measure — the point is
    showing you can tie a Python finding back into the BI narrative, not making Power BI run
    the forecast itself.
 
