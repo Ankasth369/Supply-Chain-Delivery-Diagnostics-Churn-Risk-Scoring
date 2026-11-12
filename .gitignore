@@ -11,3 +11,6 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# local-only notes
+powerbi/BUILD_GUIDE.md

@@ -88,7 +88,6 @@ python/
   delay_risk_model.ipynb       — ML test of whether OTIF failure is predictable at order time, with and without customer identity
   otif_trend_forecast.ipynb    — Holt linear-trend forecast of weekly OTIF% with a backtest
 powerbi/
-  BUILD_GUIDE.md               — page-by-page rebuild spec
   dax_measures.txt             — all 30 DAX measures, ready to paste into Power BI Desktop
 docs/
   case_study.md                — full narrative write-up
@@ -122,7 +121,8 @@ jupyter nbconvert --to notebook --execute --inplace python/delay_risk_model.ipyn
 jupyter nbconvert --to notebook --execute --inplace python/otif_trend_forecast.ipynb
 ```
 
-**5. Build the Power BI dashboard:** follow [`powerbi/BUILD_GUIDE.md`](powerbi/BUILD_GUIDE.md).
+**5. Power BI dashboard:** open `powerbi/supply_chain_delivery_diagnostics.pbix`, or recreate it
+by loading the 6 tables from MySQL and adding the measures in `powerbi/dax_measures.txt`.
 
 ## Original contributions beyond the source challenge
 
