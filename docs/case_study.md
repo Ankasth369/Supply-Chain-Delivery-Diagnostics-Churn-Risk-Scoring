@@ -25,18 +25,21 @@ I treated this as an end-to-end analytics engagement rather than a single dashbo
 3. **Original analysis beyond the brief** (`sql/04_original_analysis.sql`) — four questions
    nobody asked me to answer:
    - Does day-of-week affect delivery reliability? *(No — under 1.5 points of variation.)*
-   - Does order size predict OTIF failure? *(No net effect — on-time% rises with size while
-     in-full% falls, roughly cancelling out.)*
+   - Does order size predict OTIF failure? *(No net effect on OTIF — but on-time% rises with
+     size (44% to 87%) while in-full% falls (63% to 33%), so size changes the type of failure.)*
    - An RFM-style composite risk score (Frequency + Reliability + Recency) extending the
-     "top 5 at-risk customers" finding into a full ranked segmentation of all 35 customers.
+     "top 5 at-risk customers" finding into a full ranked segmentation of all 35 customers
+     (11 land in the Critical segment). Recency adds little here, since 34 of 35 customers
+     ordered on the last day of data, so the score is driven by frequency and reliability.
    - An illustrative revenue-at-risk estimate from the volume shortfall, using clearly-labeled
      assumed unit prices since the dataset has no price column — a transparent way to
      demonstrate business-impact quantification without fabricating a real financial figure.
 4. **Python layer** (`python/`) — three notebooks going past what SQL comfortably expresses:
-   a city×category heatmap and correlation check, a machine-learning model testing whether
-   OTIF failure is predictable at order-intake time (it isn't — ROC-AUC ~0.53 even after
-   balancing classes, which is itself the finding), and a Holt-Winters forecast projecting
-   the 29% OTIF rate stays flat for the next month absent intervention.
+   a city×category heatmap, a correlation check and a customer breakdown; a machine-learning
+   model testing whether OTIF failure is predictable at order time (from order attributes
+   alone it is not: ROC-AUC ≈ 0.52–0.53; adding customer identity lifts it to ≈ 0.66–0.67);
+   and a Holt linear-trend forecast projecting the 29% OTIF rate stays flat for the next
+   month (a backtest shows the trend term adds nothing over the historical mean).
 5. **Power BI dashboard** (`powerbi/`) — rebuilt the data model and 30 DAX measures from
    scratch, connected live to MySQL, across 4 report pages (one more than the original: a
    dedicated diagnostics page for the day-of-week/order-size/forecast findings).
@@ -46,28 +49,37 @@ I treated this as an end-to-end analytics engagement rather than a single dashbo
 - **OTIF is 29.0%** against a 65.9% average target (individually set per customer, ranging
   49-75%) — a 36.9-point gap on average, and the primary driver of contract losses.
 - **On-Time is 59.0%, In-Full is 52.8%** — both are broken, not just one.
-- **Volume Fill Rate is strong (~96%) but Line Fill Rate is weak (<68%)** — the company
-  delivers *most units* correctly but rarely delivers a full order complete, meaning the
-  shortfall is spread thin across many orders rather than concentrated.
-- **Dairy accounts for a 360,470-unit shortfall**, the largest of any category.
-- **5 high-volume customers sit under 10% OTIF** and are named specifically for retention
-  outreach; the composite risk score extends this to a full-book prioritization.
-- **The problem is structural, not situational** — it doesn't vary meaningfully by day of
-  week or order size, and a predictive model finds no learnable pattern in which orders fail.
-  That rules out "smarter order intake" as a fix and points squarely at fulfillment capacity
-  and inventory management.
+- **Volume Fill Rate is strong (96.6%) but Line Fill Rate is weak (66.0%)** — the company
+  delivers *most units* correctly but rarely delivers a full order complete. A short line is
+  about 10% short on average, so the shortfall is many small misses rather than a few large ones.
+- **Dairy has the largest shortfall in absolute terms** (360,470 of 457,779 missing units,
+  about 79%) because it is two-thirds of all order lines. Its fill rate (96.6%) matches Food
+  and Beverages, so Dairy is where the volume is, not a worse performer.
+- **5 customers sit under 10% OTIF** (three of them among the largest accounts) and are named
+  for retention outreach; the composite risk score extends this to a full-book prioritization.
+- **The customer matters more than the order.** Product, city, week and day of week each vary
+  by only a few points, and order size shifts the type of failure without changing OTIF. By
+  customer, OTIF ranges from 7% to 42%. The 8 largest customers (30% of orders) are at 15%
+  versus 35% for the other 27, with two distinct patterns: late deliveries at the large
+  accounts, and incomplete deliveries at seven customers. A classifier using only order
+  attributes is close to chance (ROC-AUC ≈ 0.52–0.53); adding the customer lifts it to
+  ≈ 0.66–0.67. The dataset has no inventory, warehouse or transport fields, so the root cause
+  inside operations is a hypothesis, not a finding.
 
 ## Recommendations and next steps
 
 **Supported by the data:**
 
-1. **Focus on fulfillment, not order intake.** Day-of-week and order size show no meaningful
-   effect, and a classifier finds no learnable pattern in failing orders, so effort should go
-   to fulfillment capacity and inventory availability.
-2. **Start with Dairy.** It has the largest unit shortfall (360,470 units) of any category.
-3. **Prioritize retention outreach.** Contact the 5 customers below 10% OTIF first, then work
+1. **Work customer by customer.** OTIF varies far more across customers (7% to 42%) than
+   across products, cities, weekdays or order sizes. Review fulfillment for the large accounts
+   (late deliveries) and the seven customers with very low in-full rates first.
+2. **Prioritize retention outreach.** Contact the 5 customers below 10% OTIF first, then work
    down the composite risk ranking of all 35 customers.
-4. **Do not expect self-correction.** The forecast holds OTIF flat near 29% without
+3. **Dairy recovers the most units.** It holds about 79% of the missing units, so fixes there
+   recover the most volume, even though its fill rate is the same as the other categories.
+4. **Don't expect order-screening rules to help.** City, order size, line count and weekday
+   carry almost no signal about which orders fail (ROC-AUC ≈ 0.52–0.53).
+5. **Do not expect self-correction.** The forecast holds OTIF flat near 29% without
    intervention.
 
 **Needs more data before acting:**
@@ -86,7 +98,8 @@ I treated this as an end-to-end analytics engagement rather than a single dashbo
 dialects), Python (pandas ETL, scikit-learn, statsmodels), and Power BI (data modeling, DAX,
 dashboard design).
 
-**The negative results matter as much as the positive ones.** Day-of-week and order size turn
-out not to matter, and a classifier cannot predict which orders will fail. Both are actionable:
-they show where *not* to spend effort (a smarter order-screening system) and where to spend it
-(warehouse and inventory operations).
+**The negative results matter as much as the positive ones.** Day of week does not matter,
+order size shifts the type of failure but not OTIF, and order attributes alone cannot predict
+which orders fail. These show where *not* to spend effort (order-screening rules) and point to
+customer-specific fulfillment problems. The data cannot say whether the cause is inventory,
+warehouse capacity or transport, which is the first thing to find out.
